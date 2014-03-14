@@ -11,16 +11,19 @@
 		}
 		</style>
 		<script src="openlayers/lib/OpenLayers.js"></script>
+		<script src="jquery.js"></script>
 		<script>
 		function init() {
 			map = new OpenLayers.Map("basicMap");
-			var local			= new OpenLayers.Layer.OSM("Local Tiles", "http://localhost/cgi-bin/tilecache.cgi/1.0.0/osm/${z}/${x}/${y}.png", {numZoomLevels: 19});
+			var local			= new OpenLayers.Layer.OSM("Local Tiles", 
+"http://<?php echo $_SERVER['SERVER_NAME']; ?>/cgi-bin/tilecache.cgi/1.0.0/osm/${z}/${x}/${y}.png", {numZoomLevels: 19});
 			var fromProjection	= new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
 			var toProjection	= new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
 			var position		= new OpenLayers.LonLat(172.6,-43.5).transform( fromProjection, toProjection);
 			var zoom			= 13; 
 
-			map.addLayer(local);
+			var osm = new OpenLayers.Layer.OSM();
+			map.addLayers([osm, local]);
 			map.setCenter(position, zoom );
 			
 
@@ -63,16 +66,18 @@
                             }
                     })
             });
-            map.addLayer(newLayer);
+            // map.addLayer(newLayer);
 <?php } ?>
 
             var switcherControl = new OpenLayers.Control.LayerSwitcher();
             map.addControl(switcherControl);
             switcherControl.maximizeControl();
-		}
+            return map;
+            }
 		</script>
+		<script src="airframe.js"></script>
 	</head>
-		<body onload="init();">
+		<body onload="map = init();track_airframe(map);">
 		<div id="basicMap"></div>
 	</body>
 </html>
